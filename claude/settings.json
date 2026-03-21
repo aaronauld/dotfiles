@@ -1,0 +1,7 @@
+{
+  "autoUpdatesChannel": "latest",
+  "statusLine": {
+    "type": "command",
+    "command": "cat | powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/Scripts/ClaudeStatus.ps1"
+  }
+}

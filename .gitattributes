@@ -1,0 +1,9 @@
+# Ensure shell scripts always use LF (required for Mac/Linux execution)
+*.sh    text eol=lf
+*.zshrc text eol=lf
+
+# Windows scripts use CRLF
+*.ps1   text eol=crlf
+
+# Everything else — normalise on commit, use platform line endings on checkout
+*       text=auto

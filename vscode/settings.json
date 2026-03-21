@@ -1,0 +1,21 @@
+{
+  "workbench.colorTheme": "Tokyo Night",
+  "workbench.iconTheme": "vscode-icons",
+  "editor.fontFamily": "FiraCode Nerd Font",
+  "terminal.integrated.fontFamily": "FiraCode Nerd Font",
+  "git.autofetch": true,
+  "editor.formatOnSave": true,
+  "editor.formatOnPaste": true,
+  "[javascript]": {
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "[typescript]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[typescriptreact]": {
+    "editor.defaultFormatter": "vscode.typescript-language-features"
+  },
+  "[python]": {
+    "editor.formatOnType": true
+  }
+}

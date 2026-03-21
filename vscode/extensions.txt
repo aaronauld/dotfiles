@@ -1,0 +1,42 @@
+# Git
+eamodio.gitlens
+donjayamanne.githistory
+
+# React / JavaScript / TypeScript
+dsznajder.es7-react-js-snippets
+formulahendry.auto-rename-tag
+esbenp.prettier-vscode
+bradlc.vscode-tailwindcss
+ecmel.vscode-html-css
+
+# Python
+ms-python.python
+ms-python.vscode-pylance
+ms-python.debugpy
+ms-python.autopep8
+ms-toolsai.jupyter
+ms-toolsai.jupyter-keymap
+ms-toolsai.jupyter-renderers
+ms-toolsai.vscode-jupyter-cell-tags
+ms-toolsai.vscode-jupyter-slideshow
+
+# Database / ORM
+mongodb.mongodb-vscode
+prisma.prisma
+
+# Theme / UI
+enkia.tokyo-night
+vscode-icons-team.vscode-icons
+zhuangtongfa.material-theme
+
+# Utilities
+aaron-bond.better-comments
+kamikillerto.vscode-colorize
+streetsidesoftware.code-spell-checker
+formulahendry.code-runner
+ritwickdey.liveserver
+
+# Platform
+ms-vscode-remote.remote-wsl
+ms-vscode.powershell
+ms-vsliveshare.vsliveshare
