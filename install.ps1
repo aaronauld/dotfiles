@@ -129,27 +129,22 @@ if (Test-Path $hookSrc) {
     Write-Host "✓ Pre-commit hook installed"
 }
 
-# Status line script
-$scriptsDir = "$env:USERPROFILE\scripts"
-New-Item -ItemType Directory -Force -Path $scriptsDir | Out-Null
-Copy-Item "$PSScriptRoot\claude\ClaudeStatus.ps1" "$scriptsDir\ClaudeStatus.ps1" -Force
+# Status line script runs directly from dotfiles — no copy needed
+$scriptPath = "$PSScriptRoot\claude\ClaudeStatus.ps1"
 
-# Write settings.json only if missing
-$settingsPath = "$claudeDir\settings.json"
-if (-not (Test-Path $settingsPath)) {
-    @"
-{
-  "autoUpdatesChannel": "latest",
-  "statusLine": {
-    "type": "command",
-    "command": "powershell -File $scriptsDir\ClaudeStatus.ps1"
-  }
-}
-"@ | Set-Content $settingsPath
-    Write-Host "✓ Claude settings.json written"
+# Merge statusLine into settings.local.json (preserves existing keys like permissions)
+$settingsLocalPath = "$claudeDir\settings.json"
+if (Test-Path $settingsLocalPath) {
+    $data = Get-Content $settingsLocalPath -Raw | ConvertFrom-Json
 } else {
-    Write-Host "✓ Claude settings.json already exists — skipping"
+    $data = [PSCustomObject]@{}
 }
+$data | Add-Member -Force -MemberType NoteProperty -Name "statusLine" -Value @{
+    type    = "command"
+    command = "powershell -File $scriptPath"
+}
+$data | ConvertTo-Json -Depth 10 | Set-Content $settingsLocalPath
+Write-Host "✓ Claude settings.json statusLine updated"
 
 Write-Host "✓ Claude Code ready"
 

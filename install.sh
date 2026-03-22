@@ -121,26 +121,31 @@ if [ -f "$CLAUDE_DIR/hooks/pre-commit" ]; then
   echo "✓ Pre-commit hook installed"
 fi
 
-# Status line script
-mkdir -p "$HOME/scripts"
-cp "$DOTFILES_DIR/claude/claude-status.sh" "$HOME/scripts/claude-status.sh"
-chmod +x "$HOME/scripts/claude-status.sh"
+# Status line script — ensure it's executable (runs directly from dotfiles, no copy needed)
+chmod +x "$DOTFILES_DIR/claude/claude-status.sh"
 
-# Write settings.json only if missing (has machine-specific path)
-if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
-  cat > "$CLAUDE_DIR/settings.json" <<EOF
-{
-  "autoUpdatesChannel": "latest",
-  "statusLine": {
-    "type": "command",
-    "command": "bash $HOME/scripts/claude-status.sh"
-  }
-}
-EOF
-  echo "✓ Claude settings.json written"
-else
-  echo "✓ Claude settings.json already exists — skipping"
-fi
+# Merge statusLine into settings.local.json (preserves existing keys like permissions)
+# Uses python3 (built into macOS) for safe JSON merge
+SETTINGS_LOCAL="$CLAUDE_DIR/settings.json"
+python3 - "$SETTINGS_LOCAL" "$DOTFILES_DIR/claude/claude-status.sh" <<'PYEOF'
+import json, sys, os
+
+settings_path = sys.argv[1]
+script_path   = sys.argv[2]
+
+try:
+    with open(settings_path) as f:
+        data = json.load(f)
+except (FileNotFoundError, json.JSONDecodeError):
+    data = {}
+
+data["statusLine"] = {"type": "command", "command": f"bash {script_path}"}
+
+with open(settings_path, "w") as f:
+    json.dump(data, f, indent=2)
+    f.write("\n")
+PYEOF
+echo "✓ Claude settings.json statusLine updated"
 
 echo "✓ Claude Code ready"
 

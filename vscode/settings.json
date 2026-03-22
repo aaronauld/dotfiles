@@ -3,6 +3,9 @@
   "workbench.iconTheme": "vscode-icons",
   "editor.fontFamily": "FiraCode Nerd Font",
   "terminal.integrated.fontFamily": "FiraCode Nerd Font",
+  "terminal.integrated.env.osx": {
+    "TERM_PROGRAM": "iTerm.app"
+  },
   "git.autofetch": true,
   "editor.formatOnSave": true,
   "editor.formatOnPaste": true,
