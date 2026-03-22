@@ -129,11 +129,11 @@ if (Test-Path $hookSrc) {
     Write-Host "✓ Pre-commit hook installed"
 }
 
-# Status line script runs directly from dotfiles — no copy needed
-$scriptPath = "$PSScriptRoot\claude\ClaudeStatus.ps1"
+# Status line script lives in ~/.claude/scripts/ (part of claude-config repo)
+$scriptPath = "$claudeDir\scripts\ClaudeStatus.ps1"
 
-# Merge statusLine into settings.local.json (preserves existing keys like permissions)
-$settingsLocalPath = "$claudeDir\settings.json"
+# Merge statusLine into settings.local.json (gitignored, machine-specific)
+$settingsLocalPath = "$claudeDir\settings.local.json"
 if (Test-Path $settingsLocalPath) {
     $data = Get-Content $settingsLocalPath -Raw | ConvertFrom-Json
 } else {
@@ -141,10 +141,10 @@ if (Test-Path $settingsLocalPath) {
 }
 $data | Add-Member -Force -MemberType NoteProperty -Name "statusLine" -Value @{
     type    = "command"
-    command = "powershell -File $scriptPath"
+    command = "powershell -NoProfile -NonInteractive -File `"$scriptPath`""
 }
 $data | ConvertTo-Json -Depth 10 | Set-Content $settingsLocalPath
-Write-Host "✓ Claude settings.json statusLine updated"
+Write-Host "✓ Claude settings.local.json statusLine updated"
 
 Write-Host "✓ Claude Code ready"
 
