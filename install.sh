@@ -72,17 +72,40 @@ else
     echo "  Install VS Code then run: bash $DOTFILES_DIR/install.sh"
 fi
 
-# ── 8. Claude Code status line ─────────────────
+# ── 8. Claude Code setup ───────────────────────────────────────────
 echo ""
-echo "▶ Setting up Claude Code status line..."
-mkdir -p "$HOME/.claude"
-mkdir -p "$HOME/scripts"
+echo "▶ Setting up Claude Code..."
 
+CLAUDE_DIR="$HOME/.claude"
+CLAUDE_REPO="git@github.com:aaronauld/claude-config.git"
+
+if [ -d "$CLAUDE_DIR/.git" ]; then
+  echo "  ~/.claude is already a git repo — pulling latest."
+  git -C "$CLAUDE_DIR" pull --quiet
+elif [ -d "$CLAUDE_DIR" ]; then
+  echo "  ⚠ ~/.claude exists but is not a git repo."
+  echo "  Back it up first: mv ~/.claude ~/.claude.bak"
+  echo "  Then re-run install.sh"
+else
+  echo "  Cloning claude-config into ~/.claude..."
+  git clone "$CLAUDE_REPO" "$CLAUDE_DIR"
+fi
+
+# Install pre-commit hook
+if [ -f "$CLAUDE_DIR/hooks/pre-commit" ]; then
+  cp "$CLAUDE_DIR/hooks/pre-commit" "$CLAUDE_DIR/.git/hooks/pre-commit"
+  chmod +x "$CLAUDE_DIR/.git/hooks/pre-commit"
+  echo "✓ Pre-commit hook installed"
+fi
+
+# Status line script
+mkdir -p "$HOME/scripts"
 cp "$DOTFILES_DIR/claude/claude-status.sh" "$HOME/scripts/claude-status.sh"
 chmod +x "$HOME/scripts/claude-status.sh"
 
-# Build settings.json with correct Mac path
-cat > "$HOME/.claude/settings.json" <<EOF
+# Write settings.json only if missing (has machine-specific path)
+if [ ! -f "$CLAUDE_DIR/settings.json" ]; then
+  cat > "$CLAUDE_DIR/settings.json" <<EOF
 {
   "autoUpdatesChannel": "latest",
   "statusLine": {
@@ -91,7 +114,12 @@ cat > "$HOME/.claude/settings.json" <<EOF
   }
 }
 EOF
-echo "✓ Claude status line configured"
+  echo "✓ Claude settings.json written"
+else
+  echo "✓ Claude settings.json already exists — skipping"
+fi
+
+echo "✓ Claude Code ready"
 
 # ── 9. FiraCode Nerd Font ──────────────────────
 echo ""

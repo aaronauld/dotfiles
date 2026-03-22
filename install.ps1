@@ -77,25 +77,56 @@ if (Get-Command code -ErrorAction SilentlyContinue) {
     Write-Host "  Install VS Code then re-run this script"
 }
 
-# ── 8. Claude Code status line ─────────────────
+# ── Claude Code setup ──────────────────────────────────────────────
 Write-Host ""
-Write-Host "▶ Setting up Claude Code status line..."
+Write-Host "▶ Setting up Claude Code..."
 
-New-Item -ItemType Directory -Force -Path "$HOME\.claude" | Out-Null
-New-Item -ItemType Directory -Force -Path "C:\Scripts" | Out-Null
+$claudeDir = "$env:USERPROFILE\.claude"
+$claudeRepo = "git@github.com:aaronauld/claude-config.git"
 
-Copy-Item "$DOTFILES_DIR\claude\ClaudeStatus.ps1" "C:\Scripts\ClaudeStatus.ps1" -Force
+if (Test-Path "$claudeDir\.git") {
+    Write-Host "  ~/.claude is already a git repo — pulling latest."
+    git -C $claudeDir pull --quiet
+} elseif (Test-Path $claudeDir) {
+    Write-Host "  ⚠ ~/.claude exists but is not a git repo."
+    Write-Host "  Rename it first: Rename-Item $claudeDir $claudeDir.bak"
+    Write-Host "  Then re-run install.ps1"
+} else {
+    Write-Host "  Cloning claude-config into ~/.claude..."
+    git clone $claudeRepo $claudeDir
+}
 
-$claudeSettings = @{
-    autoUpdatesChannel = "latest"
-    statusLine = @{
-        type    = "command"
-        command = "cat | powershell.exe -NoProfile -ExecutionPolicy Bypass -File C:/Scripts/ClaudeStatus.ps1"
-    }
-} | ConvertTo-Json -Depth 5
+# Install pre-commit hook
+$hookSrc = "$claudeDir\hooks\pre-commit"
+$hookDst = "$claudeDir\.git\hooks\pre-commit"
+if (Test-Path $hookSrc) {
+    Copy-Item $hookSrc $hookDst -Force
+    Write-Host "✓ Pre-commit hook installed"
+}
 
-Set-Content -Path "$HOME\.claude\settings.json" -Value $claudeSettings
-Write-Host "✓ Claude status line configured"
+# Status line script
+$scriptsDir = "$env:USERPROFILE\scripts"
+New-Item -ItemType Directory -Force -Path $scriptsDir | Out-Null
+Copy-Item "$PSScriptRoot\claude\ClaudeStatus.ps1" "$scriptsDir\ClaudeStatus.ps1" -Force
+
+# Write settings.json only if missing
+$settingsPath = "$claudeDir\settings.json"
+if (-not (Test-Path $settingsPath)) {
+    @"
+{
+  "autoUpdatesChannel": "latest",
+  "statusLine": {
+    "type": "command",
+    "command": "powershell -File $scriptsDir\ClaudeStatus.ps1"
+  }
+}
+"@ | Set-Content $settingsPath
+    Write-Host "✓ Claude settings.json written"
+} else {
+    Write-Host "✓ Claude settings.json already exists — skipping"
+}
+
+Write-Host "✓ Claude Code ready"
 
 # ── 9. FiraCode Nerd Font ──────────────────────
 Write-Host ""
