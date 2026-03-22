@@ -91,7 +91,7 @@ echo ""
 echo "▶ Setting up Claude Code..."
 
 CLAUDE_DIR="$HOME/.claude"
-CLAUDE_REPO="git@github.com:aaronauld/claude-config.git"
+CLAUDE_REPO="git@github-personal:aaronauld/claude-config.git"
 
 # Check SSH access to GitHub before attempting clone
 if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then

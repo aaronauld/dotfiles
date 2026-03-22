@@ -14,19 +14,55 @@ Personal development environment setup for Windows and Mac. One command to get f
 
 ## Setup
 
-### Mac (one command)
+### 1. SSH keys (required before running install)
+
+The install script clones `claude-config` (a private repo) from your personal GitHub using the `github-personal` SSH host alias. Set this up first.
+
+**Generate a personal SSH key (skip if you already have one):**
+```bash
+ssh-keygen -t ed25519 -C "your@email.com" -f ~/.ssh/id_personal
+```
+
+**Add to `~/.ssh/config`:**
+```
+# Personal GitHub
+Host github-personal
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_personal
+
+# Work GitHub (if applicable)
+Host github-work
+  HostName github.com
+  User git
+  IdentityFile ~/.ssh/id_work
+```
+
+**Add the public key to your personal GitHub account:**
+```bash
+cat ~/.ssh/id_personal.pub   # copy this → github.com → Settings → SSH keys
+```
+
+**Test it:**
+```bash
+ssh -T git@github-personal   # should say: Hi aaronauld! You've successfully authenticated
+```
+
+---
+
+### 2. Mac
 
 ```bash
 git clone https://github.com/aaronauld/dotfiles.git ~/dotfiles && bash ~/dotfiles/install.sh
 ```
 
-### Windows (one command, run in PowerShell as Administrator)
+### 2. Windows (run PowerShell as Administrator)
 
 ```powershell
 git clone https://github.com/aaronauld/dotfiles.git $HOME\dotfiles; powershell -ExecutionPolicy Bypass -File $HOME\dotfiles\install.ps1
 ```
 
-> Or if the repo is already public, run directly without cloning:
+> Or run directly without cloning:
 > ```powershell
 > irm https://raw.githubusercontent.com/aaronauld/dotfiles/main/install.ps1 | iex
 > ```

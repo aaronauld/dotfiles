@@ -97,7 +97,7 @@ Write-Host ""
 Write-Host "▶ Setting up Claude Code..."
 
 $claudeDir = "$env:USERPROFILE\.claude"
-$claudeRepo = "git@github.com:aaronauld/claude-config.git"
+$claudeRepo = "git@github-personal:aaronauld/claude-config.git"
 
 # Check SSH access to GitHub before attempting clone
 $sshTest = ssh -T git@github.com 2>&1
