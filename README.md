@@ -94,7 +94,7 @@ The script runs in order and is safe to re-run — each step checks before overw
 | Shell config | Copies `.zshrc` to `~/` | — |
 | npm globals | `typescript nodemon yarn shadcn-ui npx` | Same |
 | VS Code | Installs 28 extensions + copies settings (skips if `code` CLI not found) | Same |
-| Claude Code | Clones `claude-config` into `~/.claude` via SSH, installs pre-commit hook, copies status line script, writes `settings.json` if missing | Same |
+| Claude Code | Clones `claude-config` into `~/.claude` via SSH, installs pre-commit hook, merges `statusLine` into `~/.claude/settings.json` pointing at `claude/claude-status.sh` | Same (points at `claude/ClaudeStatus.ps1`) |
 | Font | `brew install --cask font-fira-code-nerd-font` | `winget install` |
 
 **Git identity** — the installer prompts for your name and email if they aren't already set globally. This means the same dotfiles work for both personal and work machines without hardcoding either identity.
@@ -127,7 +127,7 @@ A custom 2-line display replaces the default Claude Code status bar:
 - **Colours** — green under 50%, yellow 50–80%, red above 80%
 - Also shows rate limit windows when applicable
 
-The script lives at `~/scripts/claude-status.sh` (Mac) or `~\scripts\ClaudeStatus.ps1` (Windows) and is called by `~/.claude/settings.json`.
+The scripts run directly from the dotfiles repo — `~/dotfiles/claude/claude-status.sh` (Mac) or `~\dotfiles\claude\ClaudeStatus.ps1` (Windows). The installer writes the path into `~/.claude/settings.json`.
 
 ---
 
@@ -150,9 +150,8 @@ cd ~/.claude && git pull
 ```
 dotfiles/
 ├── claude/
-│   ├── claude-status.sh       # Mac/Linux status line script
-│   ├── ClaudeStatus.ps1       # Windows status line script
-│   └── settings.json          # Claude Code settings template
+│   ├── claude-status.sh       # Mac/Linux status line script (runs from here directly)
+│   └── ClaudeStatus.ps1       # Windows status line script (runs from here directly)
 ├── git/
 │   └── .gitconfig             # Git config (no identity — set at install time)
 ├── shell/
