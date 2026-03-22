@@ -1,6 +1,3 @@
-[user]
-	name = aaronauld
-	email = 88762795+aaronauld@users.noreply.github.com
 [filter "lfs"]
 	clean = git-lfs clean -- %f
 	smudge = git-lfs smudge -- %f

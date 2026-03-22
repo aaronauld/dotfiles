@@ -38,7 +38,21 @@ echo "✓ Git LFS configured"
 echo ""
 echo "▶ Linking git config..."
 cp "$DOTFILES_DIR/git/.gitconfig" "$HOME/.gitconfig"
-echo "✓ ~/.gitconfig"
+
+# Prompt for git identity (skip if already set)
+CURRENT_NAME=$(git config --global user.name 2>/dev/null || true)
+CURRENT_EMAIL=$(git config --global user.email 2>/dev/null || true)
+if [ -z "$CURRENT_NAME" ] || [ -z "$CURRENT_EMAIL" ]; then
+  echo ""
+  echo "  Git identity not set. Enter your details:"
+  read -p "  Name  : " GIT_NAME
+  read -p "  Email : " GIT_EMAIL
+  git config --global user.name "$GIT_NAME"
+  git config --global user.email "$GIT_EMAIL"
+  echo "✓ Git identity set"
+else
+  echo "✓ Git identity already set ($CURRENT_NAME <$CURRENT_EMAIL>) — skipping"
+fi
 
 # ── 5. Shell config ────────────────────────────
 echo ""
@@ -78,6 +92,15 @@ echo "▶ Setting up Claude Code..."
 
 CLAUDE_DIR="$HOME/.claude"
 CLAUDE_REPO="git@github.com:aaronauld/claude-config.git"
+
+# Check SSH access to GitHub before attempting clone
+if ! ssh -T git@github.com 2>&1 | grep -q "successfully authenticated"; then
+  echo ""
+  echo "  ⚠ SSH key not authenticated with GitHub."
+  echo "  To set up: https://docs.github.com/en/authentication/connecting-to-github-with-ssh"
+  echo "  Skipping claude-config clone — re-run install.sh once SSH is configured."
+  echo ""
+else
 
 if [ -d "$CLAUDE_DIR/.git" ]; then
   echo "  ~/.claude is already a git repo — pulling latest."
@@ -121,10 +144,11 @@ fi
 
 echo "✓ Claude Code ready"
 
+fi # end SSH check
+
 # ── 9. FiraCode Nerd Font ──────────────────────
 echo ""
 echo "▶ Installing FiraCode Nerd Font..."
-brew tap homebrew/cask-fonts 2>/dev/null || true
 brew install --cask font-fira-code-nerd-font 2>/dev/null && echo "✓ FiraCode Nerd Font installed" || echo "⚠ Font install failed — install manually from https://www.nerdfonts.com"
 
 # ── Done ───────────────────────────────────────

@@ -49,6 +49,21 @@ Write-Host "▶ Copying git config..."
 Copy-Item "$DOTFILES_DIR\git\.gitconfig" "$HOME\.gitconfig" -Force
 Write-Host "✓ $HOME\.gitconfig"
 
+# Prompt for git identity (skip if already set)
+$currentName = git config --global user.name 2>$null
+$currentEmail = git config --global user.email 2>$null
+if (-not $currentName -or -not $currentEmail) {
+    Write-Host ""
+    Write-Host "  Git identity not set. Enter your details:"
+    $gitName = Read-Host "  Name"
+    $gitEmail = Read-Host "  Email"
+    git config --global user.name $gitName
+    git config --global user.email $gitEmail
+    Write-Host "✓ Git identity set"
+} else {
+    Write-Host "✓ Git identity already set ($currentName <$currentEmail>) — skipping"
+}
+
 # ── 6. Global npm packages ─────────────────────
 Write-Host ""
 Write-Host "▶ Installing global npm packages..."
@@ -83,6 +98,16 @@ Write-Host "▶ Setting up Claude Code..."
 
 $claudeDir = "$env:USERPROFILE\.claude"
 $claudeRepo = "git@github.com:aaronauld/claude-config.git"
+
+# Check SSH access to GitHub before attempting clone
+$sshTest = ssh -T git@github.com 2>&1
+if ($sshTest -notmatch "successfully authenticated") {
+    Write-Host ""
+    Write-Host "  ⚠ SSH key not authenticated with GitHub." -ForegroundColor Yellow
+    Write-Host "  To set up: https://docs.github.com/en/authentication/connecting-to-github-with-ssh"
+    Write-Host "  Skipping claude-config clone — re-run install.ps1 once SSH is configured."
+    Write-Host ""
+} else {
 
 if (Test-Path "$claudeDir\.git") {
     Write-Host "  ~/.claude is already a git repo — pulling latest."
@@ -127,6 +152,8 @@ if (-not (Test-Path $settingsPath)) {
 }
 
 Write-Host "✓ Claude Code ready"
+
+} # end SSH check
 
 # ── 9. FiraCode Nerd Font ──────────────────────
 Write-Host ""
