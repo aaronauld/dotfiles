@@ -136,9 +136,10 @@ if (Test-Path $settingsPath) {
 } else {
     $data = [PSCustomObject]@{}
 }
+$scriptPath = "$claudeDir\scripts\ClaudeStatus.ps1"
 $data | Add-Member -Force -MemberType NoteProperty -Name "statusLine" -Value @{
     type    = "command"
-    command = 'powershell -NoProfile -NonInteractive -Command "& (Join-Path $env:USERPROFILE ''.claude\scripts\ClaudeStatus.ps1'')"'
+    command = "powershell -NoProfile -NonInteractive -File `"$scriptPath`""
 }
 $data | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
 Write-Host "✓ Claude settings.json statusLine updated"
