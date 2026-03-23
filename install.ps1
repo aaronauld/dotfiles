@@ -129,14 +129,14 @@ if (Test-Path $hookSrc) {
     Write-Host "✓ Pre-commit hook installed"
 }
 
-# Merge statusLine into settings.json — use $HOME so path works on any machine
+# Merge statusLine into settings.json — path resolved at install time per machine
+$scriptPath = "$claudeDir\scripts\ClaudeStatus.ps1"
 $settingsPath = "$claudeDir\settings.json"
 if (Test-Path $settingsPath) {
     $data = Get-Content $settingsPath -Raw | ConvertFrom-Json
 } else {
     $data = [PSCustomObject]@{}
 }
-$scriptPath = "$claudeDir\scripts\ClaudeStatus.ps1"
 $data | Add-Member -Force -MemberType NoteProperty -Name "statusLine" -Value @{
     type    = "command"
     command = "powershell -NoProfile -NonInteractive -File `"$scriptPath`""
