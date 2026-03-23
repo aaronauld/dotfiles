@@ -129,22 +129,19 @@ if (Test-Path $hookSrc) {
     Write-Host "✓ Pre-commit hook installed"
 }
 
-# Status line script lives in ~/.claude/scripts/ (part of claude-config repo)
-$scriptPath = "$claudeDir\scripts\ClaudeStatus.ps1"
-
-# Merge statusLine into settings.local.json (gitignored, machine-specific)
-$settingsLocalPath = "$claudeDir\settings.local.json"
-if (Test-Path $settingsLocalPath) {
-    $data = Get-Content $settingsLocalPath -Raw | ConvertFrom-Json
+# Merge statusLine into settings.json — use $HOME so path works on any machine
+$settingsPath = "$claudeDir\settings.json"
+if (Test-Path $settingsPath) {
+    $data = Get-Content $settingsPath -Raw | ConvertFrom-Json
 } else {
     $data = [PSCustomObject]@{}
 }
 $data | Add-Member -Force -MemberType NoteProperty -Name "statusLine" -Value @{
     type    = "command"
-    command = "powershell -NoProfile -NonInteractive -File `"$scriptPath`""
+    command = 'powershell -NoProfile -NonInteractive -Command "& \"$HOME\.claude\scripts\ClaudeStatus.ps1\""'
 }
-$data | ConvertTo-Json -Depth 10 | Set-Content $settingsLocalPath
-Write-Host "✓ Claude settings.local.json statusLine updated"
+$data | ConvertTo-Json -Depth 10 | Set-Content $settingsPath
+Write-Host "✓ Claude settings.json statusLine updated"
 
 Write-Host "✓ Claude Code ready"
 
